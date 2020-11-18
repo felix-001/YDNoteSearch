@@ -48,8 +48,6 @@ class YoudaoNoteSession(requests.Session):
         }
         resp = self.post('https://note.youdao.com/login/acc/urs/verify/check?app=web&product=YNOTE&tp=urstoken&cf=6&fr=1&systemName=&deviceType=&ru=https%3A%2F%2Fnote.youdao.com%2FsignIn%2F%2FloginCallback.html&er=https%3A%2F%2Fnote.youdao.com%2FsignIn%2F%2FloginCallback.html&vcode=&systemName=&deviceType=&timestamp=' + timestamp(), data=data, allow_redirects=True)
         print('login resp: ' + str(resp.status_code))
-        print('login cookies: ' + str(self.cookies))
-        print("resp.cookies type : " + str(type(self.cookies)))
         resp = self.get('https://note.youdao.com/yws/mapi/user?method=get&multilevelEnable=true&_=' + timestamp())
         print('multilevelEnable: ' + str(resp.status_code))
         cookies_dict = requests.utils.dict_from_cookiejar(self.cookies)
