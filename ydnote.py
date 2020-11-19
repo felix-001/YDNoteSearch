@@ -8,6 +8,10 @@ import os
 import http.cookiejar as cj
 from requests.cookies import create_cookie
 import json
+from workflow import Workflow
+
+reload(sys)  
+sys.setdefaultencoding('utf8')
 
 def timestamp():
     return str(int(time.time() * 1000))
@@ -74,16 +78,24 @@ class YoudaoNoteSession(requests.Session):
         with open('%s/%s.docx' % (saveDir, id), 'w') as fp:
             fp.write(response.content)
 
-if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print('args: <username> <password> <keyword>' )
-        sys.exit(1)
-    username = sys.argv[1]
-    password = sys.argv[2]
+def main(wf):
+    username = os.getenv("YDNOTE_USER")
+    password = os.getenv("YDNOTE_PASSWD")
     sess = YoudaoNoteSession()
-    notes = sess.search(sys.argv[3])
+    notes = sess.search(sys.argv[1])
     if notes == None:
         sess.login(username, password)
-        notes = sess.search(sys.argv[3])
-    print(notes[0]['fileEntry']['name'])
-    sess.getNoteDocx(notes[0]['fileEntry']['id'], "./")
+        notes = sess.search(sys.argv[1])
+    i = 0
+    while i < len(notes):
+        print(notes[i]['fileEntry']['name'])
+        wf.add_item(title=notes[i]['fileEntry']['name'])
+        i = i + 1
+    wf.send_feedback()
+
+if __name__ == '__main__':
+    if len(sys.argv) < 1:
+        print('args: <keyword>' )
+        sys.exit(1)
+    wf = Workflow() 
+    sys.exit(wf.run(main))
